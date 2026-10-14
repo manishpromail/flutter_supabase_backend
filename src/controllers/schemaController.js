@@ -14,9 +14,10 @@ const getSchemaInfo = async (req, res) => {
 
     for (const tbl of tables) {
       try {
+        const col = tbl === 'product_categories' ? 'product_id' : 'id';
         const { count, error } = await supabase
           .from(tbl)
-          .select('id', { count: 'exact' })
+          .select(col, { count: 'exact' })
           .limit(1);
 
         if (error) {
