@@ -5,6 +5,8 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const schemaRoutes = require('./routes/schemaRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,7 +20,12 @@ app.use(morgan('dev')); // Logs incoming HTTP requests in terminal
 app.get('/', (req, res) => {
   res.json({
     status: 'online',
-    message: 'Full-Stack Flutter + Node.js + Supabase API is running 🚀',
+    message: 'Full-Stack Mobile + Node.js + Supabase Relational API is running 🚀',
+    relationships: {
+      'one_to_one': 'products <-> product_details (Unique FK)',
+      'one_to_many': 'products <-> reviews (Product has Many Reviews)',
+      'many_to_many': 'products <-> categories (via product_categories junction table)'
+    },
     endpoints: {
       auth: {
         signup: 'POST /api/auth/signup',
@@ -27,7 +34,16 @@ app.get('/', (req, res) => {
       },
       products: {
         list: 'GET /api/products',
-        create: 'POST /api/products'
+        detail: 'GET /api/products/:id',
+        create: 'POST /api/products',
+        add_review: 'POST /api/products/:id/reviews'
+      },
+      categories: {
+        list: 'GET /api/categories',
+        create: 'POST /api/categories'
+      },
+      schema: {
+        info: 'GET /api/schema/relationships'
       }
     }
   });
@@ -40,6 +56,8 @@ app.get('/api/health', (req, res) => {
 // Mount Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/schema', schemaRoutes);
 
 // 404 Handler
 app.use((req, res) => {
